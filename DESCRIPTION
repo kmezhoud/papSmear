@@ -1,0 +1,29 @@
+Package: papSmear
+Title: Cervical Smear Cell Predictor
+Version: 0.99.0
+Date: 2018-03-10
+Authors@R: person("Karim", "Mezhoud", , "kmezhoud@gamil.com", c("aut", "cre"))
+Description: A shiny app for screening papanicolaou test images from cervix smear.
+Depends:
+    R (>= 3.4.2),
+    shiny (>= 0.14),
+    shinydashboard,
+    magrittr,
+    DT
+Imports:
+    htmlwidgets,
+    htmltools,
+    imager,
+    EBImage,
+    mxnet,
+    keras,
+    dplyr,
+    DT
+Suggests:
+    testthat (>= 1.0.0),
+    covr (>= 1.2.0)
+URL: https://github.com/kmezhoud/papSmear
+BugReports: https://github.com/kmezhoud/papSmear/issues
+License: AGPL-3 | file LICENSE
+LazyData: true
+RoxygenNote: 6.0.1

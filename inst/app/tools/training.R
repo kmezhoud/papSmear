@@ -41,10 +41,12 @@ observe({
         for(i in seq_len(length(listFiles))){
           ## try file 
           robjname <- try(
-            classes[[paste0("c",i)]] <- images2matrix(paste0(listFiles[i], "/"), w= input$resolutionId, h= input$resolutionId, class= i)
+            classes[[paste0("c",i)]] <- images2matrix(paste0(listFiles[i], "/"), 
+                                                      w= input$resolutionId, h= input$resolutionId, class= i)
             , silent = TRUE)
           if (is(robjname, "try-error")) {
-            showNotification(ui = "Select a valid folder that content jpeg or png or bmp images.", id = "img2matrixErrorID",
+            showNotification(ui = "Select a valid folder that content jpeg or png or bmp images.", 
+                             id = "img2matrixErrorID",
                              duration = NULL, type = "warning")
             
             ## reset switchButton of image2matrix
@@ -112,7 +114,8 @@ observe({
       withProgress(message = 'Compiling the model ... ', value = 0.6, {
         Sys.sleep(0.25)
         
-        list_smp <- merge_train_test(r_data$classes, n_test= input$numberTestingId)
+        ## sampling and merging training and testing sets
+        list_smp <- merge_train_test(r_data$classes, n_test = input$numberTestingId)
         
         ## make Train and Test dataframes available for globalEnv
         r_data[['Train']] <- list_smp$allTrain
@@ -205,6 +208,8 @@ observe({
       
       
       r_data[["trained_model_mxnetCNN"]] <- model
+      #trained_model_mxnet_CNN_bkp <<- model
+      
       })
     }else if(input$ModelId == 'keras_MLP'){
       
@@ -230,20 +235,20 @@ observe({
 ## Predict/ evaluat/ Test
 
 observe({
-  if(not_pressed(input$predictSBID))  return()
+  if(not_pressed(input$testSBID))  return()
   isolate({
     
     if(!is.null(r_data$trained_model_mxnetCNN)){  #  && input$trained_model != 0
       
       # predict.MXFeedForwardModel function is not exported by mxnet
-      predicted <- mxnet:::predict.MXFeedForwardModel(model = r_data$trained_model_mxnetCNN, 
+      tested <- mxnet:::predict.MXFeedForwardModel(model = r_data$trained_model_mxnetCNN, 
                                                       X = r_data$test_array)
       # Assign labels
-      predicted_labels <- max.col(t(predicted)) -1
-      r_data[["predicted_labels"]] <- predicted_labels
+      tested_labels <- max.col(t(tested)) -1
+      r_data[["tested_labels"]] <- tested_labels
       
       # Get accuracy
-       r_data[["result_mxnet.CNN"]] <- table(r_data$test_y, predicted_labels)
+       r_data[["result_mxnet.CNN"]] <- table(r_data$test_y, tested_labels)
       
       
       

@@ -1,4 +1,5 @@
 
+
 ## list folders of training images
 output$trainDirectorylist = renderText({
   readDirectoryInput(session, 'trainDirectory')
@@ -68,7 +69,7 @@ caption.placement = getOption("xtable.caption.placement", "top")
 )
 
 ##################################################
-###########   Compile column   ###################
+###########   Compile Models   ###################
 ##################################################
 
 
@@ -125,27 +126,29 @@ output$trainedModel_notification <- renderTable({
   
 })
 
+##################################################
+###########   Test Models   ###################
+##################################################
 
-
-output$ui_predictSB <- renderUI({
+output$ui_testSB <- renderUI({
   
   div(class="row",
       div(class="col-xs-8",
-          conditionalPanel(condition = " input.predictSBID ==false",
-                           tags$b('Predict',  style = "color:#7f7f7f")),
-          conditionalPanel(condition = " input.predictSBID == true",
-                           tags$b('Predict',  style = "color:#428bca"))
+          conditionalPanel(condition = " input.testSBID ==false",
+                           tags$b('Test the model',  style = "color:#7f7f7f")),
+          conditionalPanel(condition = " input.testSBID == true",
+                           tags$b('Test the model',  style = "color:#428bca"))
       ),
       div(class="col-xs-4",
           # conditionalPanel(condition = "input.StudiesIDCircos != null",
-          switchButton(inputId = "predictSBID",
+          switchButton(inputId = "testSBID",
                        value = FALSE, col = "GB", type = "OO")
           #)
       )
   )
 })
 
-output$predict_result_mxnet.CNN <- renderTable({
+output$test_result_mxnet.CNN <- renderTable({
   if(!is.null(r_data$result_mxnet.CNN)){
     ## convert table to dataframe 
     df <- as.data.frame.matrix(r_data$result_mxnet.CNN)
@@ -158,7 +161,7 @@ output$predict_result_mxnet.CNN <- renderTable({
 })
 
 
-output$predict_result_keras.MLP <- renderPrint({
+output$test_result_keras.MLP <- renderPrint({
   if(!is.null(r_data$result_keras.MLP)){
     
     print(r_data[["result_keras.MLP"]])
@@ -169,18 +172,18 @@ output$predict_result_keras.MLP <- renderPrint({
 
 
 
-output$ui_viewPredImgSB <- renderUI({
+output$ui_viewTestedImgSB <- renderUI({
   
   div(class="row",
       div(class="col-xs-8",
-          conditionalPanel(condition = " input.view_predImgSBID ==false",
-                           tags$b('View Predicted Class',  style = "color:#7f7f7f")),
-          conditionalPanel(condition = " input.view_predImgSBID == true",
-                           tags$b('View Predicted Class',  style = "color:#428bca"))
+          conditionalPanel(condition = " input.view_testImgSBID ==false",
+                           tags$b('View tested class',  style = "color:#7f7f7f")),
+          conditionalPanel(condition = " input.view_testImgSBID == true",
+                           tags$b('View tested class',  style = "color:#428bca"))
       ),
       div(class="col-xs-4",
           # conditionalPanel(condition = "input.StudiesIDCircos != null",
-          switchButton(inputId = "view_predImgSBID",
+          switchButton(inputId = "view_testImgSBID",
                        value = FALSE, col = "GB", type = "OO")
           #)
       )
@@ -280,7 +283,7 @@ output$ui_training <- renderUI({
   fluidRow(
     column( width = 4,
     
-            box(class= "lavende",  width = 12, title = "train the Model", collapsible = TRUE,
+            box(class= "lavende",  width = 12, title = "Train the Model", collapsible = TRUE,
                 collapsed = FALSE,   solidHeader = TRUE, #background = "blue",
                 tabItem(tabName = "inputTrainModel",
                         
@@ -303,7 +306,7 @@ output$ui_training <- renderUI({
                           
                         ),
                         uiOutput("ui_trainModelSB"),
-                        uiOutput("ui_predictSB")
+                        uiOutput("ui_testSB")
                         
                 )
             )
@@ -330,25 +333,25 @@ output$ui_training <- renderUI({
     column(
       width = 4,
       
-      
-      box(class= "lavende", title = "Result of prediction", width = 14 , collapsible = TRUE,
+      box(class= "lavende", title = "Result of testing", width = 14 , collapsible = TRUE,
           collapsed = FALSE, solidHeader = TRUE,
           
           ## get means of identical labels, located in the diagonal
           
-          #if(!is.null(r_data$predicted_labels)){  # r_data$result_mxnet.CNN
+          #if(!is.null(r_data$tested_labels)){  # r_data$result_mxnet.CNN
           conditionalPanel("input.ModelId == 'mxnet_CNN'",
+                            conditionalPanel("input.testSBID == true",
+                           #h4("score =  ", sum(diag(table(r_data$test_y,r_data$tested_labels)))/length(r_data$test_y),
+                          #   style="color:red"), # , align="center"
                            
-                            #h4("score =  ", sum(diag(table(r_data$test_y,r_data$predicted_labels)))/length(r_data$test_y),
-                             # style="color:red"), # , align="center"
-                           div(tableOutput('predict_result_mxnet.CNN'),
+                           div(tableOutput('test_result_mxnet.CNN'),
                                style = "font-size: 75%; width: 80%; overflow-y: scroll; align:center")
                            
-          ),
+          )),
           #  }else if(!is.null(r_data$result_keras.MLP)){
           conditionalPanel("input.ModelId == 'keras_MLP'",
                            
-                           textOutput("predict_result_keras.MLP")
+                           textOutput("test_result_keras.MLP")
                            
           )
           # }
@@ -358,36 +361,38 @@ output$ui_training <- renderUI({
     ),
     fluidRow(
     column( width = 4,
-            box(class= "lavende", title = "View predicted class", width = 14 , collapsible = TRUE,
-                collapsed = FALSE, solidHeader = TRUE,
+            box(class= "lavende", title = "View tested classes", width = 14 , collapsible = TRUE,
+                collapsed = FALSE, solidHeader = TRUE
                 
+                ## update list of classes/folders
+                #updateSelectInput(session, "tested_classID",choices = r_data$listFolders,selected = "")
                 
-                 selectizeInput("classID", label = "View predicted class:", choices = r_data$listFolders,
-                                selected = "", multiple = TRUE),
-                
-                uiOutput("ui_viewPredImgSB")
+                #  selectizeInput("tested_classID", label = "View tested class:", choices = r_data$listFolders,
+                #                 selected = "", multiple = FALSE),
+                # 
+                # uiOutput("ui_viewTestedImgSB")
           
                   )
       
     ),
-    column(width = 8,
-           tagList(
-           conditionalPanel("input.view_predImgSBID == true",
-                            
-                           # splitLayout(
-                             lapply(1:15, function(i){
-
-                              div(style="display:inline-block",
-                                  tags$a(plotOutput(paste0("display_image",i),
-                                                     width= 110, height = 110), # input$zoom_MedicalReport
-                                         href="https://www.google.com" )
-                                  #helpText( a("Click Here for the Source Code on Github!",
-                                  #           href="https://github.com/Bohdan-Khomtchouk/Microscope",target="_blank"))
-                              )
-                            })
-                            #)
-           )
-           )
+    column(width = 8
+           # tagList(
+           # conditionalPanel("input.view_testImgSBID == true",
+           #                  
+           #                 # splitLayout(
+           #                   lapply(1:10, function(i){
+           # 
+           #                    div(style="display:inline-block",
+           #                        tags$a(plotOutput(paste0("display_tested_image",i),
+           #                                           width= 110, height = 110), # input$zoom_MedicalReport
+           #                               href="https://www.google.com" )
+           #                        #helpText( a("Click Here for the Source Code on Github!",
+           #                        #           href="https://github.com/Bohdan-Khomtchouk/Microscope",target="_blank"))
+           #                    )
+           #                  })
+           #                  #)
+           # )
+           # )
            
            
            )

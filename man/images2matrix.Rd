@@ -2,7 +2,7 @@
 % Please edit documentation in R/images2matrix.R
 \name{images2matrix}
 \alias{images2matrix}
-\title{Convert images into matrix. Each row corresponds to one image}
+\title{Convert image files into matrix from folder. Each row corresponds to one image}
 \usage{
 images2matrix(inputFolder, w = 28, h = 28, class)
 }
@@ -13,13 +13,13 @@ images2matrix(inputFolder, w = 28, h = 28, class)
 
 \item{h}{The resized length of image (pixels)}
 
-\item{class}{class label as integer.}
+\item{class}{class label as integer (1, 2, 3,...).}
 }
 \value{
 a data frame. The first column is the label of each image. the other column are the value of the pixels.
 }
 \description{
-Convert images into matrix. Each row corresponds to one image
+Convert image files into matrix from folder. Each row corresponds to one image
 }
 \examples{
 \dontrun{

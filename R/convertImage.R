@@ -31,6 +31,7 @@ convert_image <- function(inputFolder, outputFolder, type = '.jpeg' ){
     # load image 
     tmp_img <- imager::load.image(paste(inputFolder,nameFile, sep="/"))
     # save image
-    imager::save.image(im = tmp_img, file = paste0(outputFolder,'/', tools::file_path_sans_ext(nameFile), type ),quality = 1)
+    imager::save.image(im = tmp_img, file = paste0(outputFolder,'/',
+                                                   tools::file_path_sans_ext(nameFile), type ),quality = 1)
   }
 }

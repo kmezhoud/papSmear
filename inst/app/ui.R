@@ -16,6 +16,7 @@ ui <- dashboardPage( skin = "green",
                            "Preprocessing", tabName = "preprocessing",icon = icon("table"),
                            menuSubItem("Set training model", tabName = "set_train"),
                            menuSubItem("Convert Images",tabName = "convert_images"),
+                           menuSubItem("Image Augmentation", tabName = "image_augmentation"),
                            menuSubItem("Team av ppg by Manager", tabName = "m_ppg",icon = icon("star"))
                          )
                        )
@@ -28,12 +29,12 @@ ui <- dashboardPage( skin = "green",
                        tabItems(
                          # Front Page
                          tabItem("frontPage",
-                                 uiOutput('ui_training')     
+                                 uiOutput('ui_predict')     
                           
                          ),
-                         tabItem("set_train"
+                         tabItem("set_train",
                                  
-                       
+                                 uiOutput('ui_training') 
                                  
                          ),
                       
@@ -42,6 +43,10 @@ ui <- dashboardPage( skin = "green",
                           uiOutput('ui_convert') 
                                  
                                  
+                                 ),
+                         tabItem("image_augmentation",
+                                 
+                                 uiOutput('ui_augmentation')
                                  )
                          
                        )

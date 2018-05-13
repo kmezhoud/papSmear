@@ -17,9 +17,13 @@
 sampling_train_test <- function(df, n_test = 5 ){
   
   test <- dplyr::sample_n(df, n_test )
+  #test_bkp <<- test
   ## omit test rows from train and remove duplicates if exist
-  train <-  df[-duplicated(rbind(test, df)),]
+  train <- df[!(rownames(df) %in% rownames(test)),]
   
+  #train <-  df[-duplicated(rbind(test, df)),]
+  
+  #train_bkp <<- train
   return(list(train = train, test = test))
 }
 
@@ -37,7 +41,7 @@ sampling_train_test <- function(df, n_test = 5 ){
 #' merge_train_test(list.df, 5)
 #' }
 #' @import mxnet
-#' @import keras
+#' @importFrom keras fit evaluate predict_classes keras_model_sequential layer_dense layer_dropout compile to_categorical
 merge_train_test <- function(list.df, n_test ){
   
   set.seed(1234)

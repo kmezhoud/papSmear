@@ -8,8 +8,7 @@ Depends:
     R (>= 3.4.2),
     shiny (>= 0.14),
     shinydashboard,
-    magrittr,
-    DT
+    magrittr
 Imports:
     htmlwidgets,
     htmltools,
@@ -17,8 +16,7 @@ Imports:
     EBImage,
     mxnet,
     keras,
-    dplyr,
-    DT
+    dplyr
 Suggests:
     testthat (>= 1.0.0),
     covr (>= 1.2.0)

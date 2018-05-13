@@ -1,56 +1,73 @@
 
 ## visualize image from vector
-vec2img <- function(df, nrow){
-  
-  ##  plot(EBImage::Image(x_test[1,], dim = c(28,28) ))
-  
-  i <- EBImage::Image(as.numeric(df[nrow,]))
-  sqr <- sqrt(length(df[nrow,])) 
-  dim(i) <- c(sqr,sqr, 1)
-  i <- EBImage::resize(i, w= 156, h= 156)
-  
-  plot(i)
-}
+# vec2img <- function(df, nrow){
+# 
+#   ##  plot(EBImage::Image(x_test[1,], dim = c(28,28) ))
+# 
+#   i <- EBImage::Image(as.numeric(df[nrow,]))
+#   sqr <- sqrt(length(df[nrow,]))
+#   dim(i) <- c(sqr,sqr, 1)
+#   i <- EBImage::resize(i, w= 140, h= 140)
+# 
+#   plot(i)
+#   return(i)
+# }
 #vec2img(class1_mat[,-1], 65)
 
 
 
-## render multiple Image using lapply
+## render image  for tested classes
 
 lapply(1:15, function(i){
-  output[[paste0('display_image',i)]] <- renderPlot({
+  output[[paste0('display_tested_image',i)]] <- renderPlot({
    
-    ## genrate index for each class/folder
+    ## generate index for each class/folder
     key0 <- strsplit(r_data$listFolders, ",")
     df.index <- data.frame(index = rep(seq_along(key0), sapply(key0, length)),ID = unlist(key0))
-    idx <- df.index[which(df.index[,2]== input$classID),1]
+    idx <- df.index[which(df.index[,2]== input$tested_classID),1]
     
     
     ## we would like to select classes 3 
     selected_vec <- names(r_data$test_y[r_data$test_y == idx])
     
-    selected_vec_bkp <<- selected_vec
-    Test_bkp <<- r_data$Test
-    test_y_bkp <<- r_data$test_y
+   # selected_vec_bkp <<- selected_vec
+    #Test_bkp <<- r_data$Test
+    #test_y_bkp <<- r_data$test_y
     
-    #class(test[selected_vec,][,-1][1:5, 1:6])
-    #for(i in seq_along(selected_vec)){
-      vec2img(r_data$Test[selected_vec,][,-1],i)
+      vec2img(r_data$Test[selected_vec,][,-1],i,w= 28, h= 28)
       
-    #}
+  
 
-    # ##  with selecting report file input$reports_Med from sidebar menu
-    # image_file <- paste(paste0(readDirectoryInput(session, 'directory'), input$periodeId_Med, sep=""),
-    #                     "/", input$reports_Med[i] ,sep="")
-    # 
-    # 
-    # return(list(
-    #   src = image_file,
-    #   filetype = "image/jpg",
-    #   height = "1000%",
-    #   width = "100%"
-    # ))
+  })
+})
+
+
+
+## render images for predicted classes
+
+lapply(1:15, function(i){
+  output[[paste0('display_predicted_image',i)]] <- renderPlot({
     
- # }, deleteFile = FALSE)
+    ## generate index for each class/folder
+    key0 <- strsplit(r_data$listFolders, ",")
+    df.index <- data.frame(index = rep(seq_along(key0), sapply(key0, length)),ID = unlist(key0))
+    idx <- df.index[which(df.index[,2]== input$predicted_classID),1]
+    
+    selected_vec <- which(r_data$predicted_labels == idx)
+    
+    vec2img(r_data$mat_for_prediction[selected_vec,][,-1],i,w= 28, h= 28)
+    
+    
+    ## we would like to select classes 3 
+    #selected_vec <- r_data$pred_y[r_data$pred_y == idx]
+    
+    #selected_vec_pred_bkp <<- selected_vec
+    #pred_x_bkp <<- r_data$pred_x
+    #pred_y_bkp <<- r_data$pred_y
+    
+    #vec2img(r_data$pred_x[selected_vec,][,-1],i)
+    
+    
+    
   })
 })

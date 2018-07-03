@@ -1,7 +1,7 @@
 Package: papSmear
 Title: Cervical Smear Cell Predictor
 Version: 0.99.01
-Date: 2018-03-10
+Date: 2018-07-03
 Authors@R: person("Karim", "Mezhoud", , "kmezhoud@gamil.com", c("aut", "cre"))
 Description: A shiny app for screening papanicolaou test images from cervix smear.
 Depends:

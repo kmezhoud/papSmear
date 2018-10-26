@@ -23,8 +23,8 @@ lapply(1:15, function(i){
    
     ## generate index for each class/folder
     key0 <- strsplit(r_data$listFolders, ",")
-    df.index <- data.frame(index = rep(seq_along(key0), sapply(key0, length)),ID = unlist(key0))
-    idx <- df.index[which(df.index[,2]== input$tested_classID),1]
+    df.index <- data.frame(index = rep(seq_along(key0), sapply(key0, length)), ID = unlist(key0))
+    idx <- df.index[which(df.index[,2] == input$tested_classID),1]
     
     
     ## we would like to select classes 3 

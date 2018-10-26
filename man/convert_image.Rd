@@ -8,7 +8,7 @@ convert_image(inputFolder, outputFolder, type = ".jpeg")
 }
 \arguments{
 \item{inputFolder}{Folder that content the subfolders of images with other extension that jpeg and png. 
-Each subfolder corresponds to one classe.}
+Each subfolder corresponds to one class.}
 
 \item{outputFolder}{The folder where will save cponverted images.}
 

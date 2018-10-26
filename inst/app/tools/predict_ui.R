@@ -93,10 +93,10 @@ output$ui_predict <- renderUI({
                                               
                                               uiOutput("ui_viewPredImgSB")
                                               ),
-                             selectizeInput("tested_classID", label = "View tested class:", choices = r_data$listFolders,
-                                            selected = "", multiple = FALSE),
-                             
-                             uiOutput("ui_viewTestedImgSB"),
+                             # selectizeInput("tested_classID", label = "View tested class:", choices = r_data$listFolders,
+                             #                selected = "", multiple = FALSE),
+                             # 
+                             # uiOutput("ui_viewTestedImgSB"),
                              
                              div(class="row",
                                  div(class="col-xs-6"
@@ -158,21 +158,21 @@ output$ui_predict <- renderUI({
       
       
       tagList(
-        conditionalPanel("input.view_testImgSBID == true",
-                         
-                         # splitLayout(
-                         lapply(1:15, function(i){
-                           
-                           div(style="display:inline-block",
-                               tags$a(plotOutput(paste0("display_tested_image",i),
-                                                 width= 110, height = 110), # input$zoom_MedicalReport
-                                      href="https://www.google.com" )
-                               #helpText( a("Click Here for the Source Code on Github!",
-                               #           href="https://github.com/Bohdan-Khomtchouk/Microscope",target="_blank"))
-                           )
-                         })
-                         #)
-        )
+        # conditionalPanel("input.view_testImgSBID == true",
+        #                  
+        #                  # splitLayout(
+        #                  lapply(1:15, function(i){
+        #                    
+        #                    div(style="display:inline-block",
+        #                        tags$a(plotOutput(paste0("display_tested_image",i),
+        #                                          width= 110, height = 110), # input$zoom_MedicalReport
+        #                               href="https://www.google.com" )
+        #                        #helpText( a("Click Here for the Source Code on Github!",
+        #                        #           href="https://github.com/Bohdan-Khomtchouk/Microscope",target="_blank"))
+        #                    )
+        #                  })
+        #                  #)
+        # )
       )
     )
   )

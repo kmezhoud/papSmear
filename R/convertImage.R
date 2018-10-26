@@ -1,7 +1,7 @@
 #' Convert image to jpeg or png
 #'
 #' @param inputFolder Folder that content the subfolders of images with other extension that jpeg and png. 
-#'                   Each subfolder corresponds to one classe.
+#'                   Each subfolder corresponds to one class.
 #' @param outputFolder The folder where will save cponverted images.
 #' @param type  the type of extension jpeg, png all supported extesion by imager package
 #'

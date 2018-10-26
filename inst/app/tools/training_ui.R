@@ -177,9 +177,9 @@ output$ui_viewTestedImgSB <- renderUI({
   div(class="row",
       div(class="col-xs-8",
           conditionalPanel(condition = " input.view_testImgSBID ==false",
-                           tags$b('View tested class',  style = "color:#7f7f7f")),
+                           tags$b('View selected class',  style = "color:#7f7f7f")),
           conditionalPanel(condition = " input.view_testImgSBID == true",
-                           tags$b('View tested class',  style = "color:#428bca"))
+                           tags$b('View selected class',  style = "color:#428bca"))
       ),
       div(class="col-xs-4",
           # conditionalPanel(condition = "input.StudiesIDCircos != null",
@@ -302,7 +302,8 @@ output$ui_training <- renderUI({
                           ),
                           
                           selectInput(inputId = "optimizerID", label = "Optimizer Mode",
-                                      choices = c('sgd', 'adam', 'RMSprop'), selected = "sgd")
+                                      choices = list('SGD'= 'sgd', 'ADAM'= 'adam', 'RMSPROP' = 'RMSprop'),
+                                      selected = 'sgd')
                           
                         ),
                         uiOutput("ui_trainModelSB"),
@@ -362,41 +363,45 @@ output$ui_training <- renderUI({
     fluidRow(
     column( width = 4,
             box(class= "lavende", title = "View tested classes", width = 14 , collapsible = TRUE,
-                collapsed = FALSE, solidHeader = TRUE
+                collapsed = FALSE, solidHeader = TRUE,
                 
                 ## update list of classes/folders
                 #updateSelectInput(session, "tested_classID",choices = r_data$listFolders,selected = "")
                 
-                #  selectizeInput("tested_classID", label = "View tested class:", choices = r_data$listFolders,
-                #                 selected = "", multiple = FALSE),
-                # 
-                # uiOutput("ui_viewTestedImgSB")
+                 selectizeInput( inputId ="tested_classID", label = "", choices = r_data$listFolders,
+                               selected = r_data$listFolders[1], multiple = FALSE),
+
+                uiOutput("ui_viewTestedImgSB")
           
                   )
       
     ),
     column(width = 8
-           # tagList(
-           # conditionalPanel("input.view_testImgSBID == true",
-           #                  
-           #                 # splitLayout(
-           #                   lapply(1:10, function(i){
-           # 
-           #                    div(style="display:inline-block",
-           #                        tags$a(plotOutput(paste0("display_tested_image",i),
-           #                                           width= 110, height = 110), # input$zoom_MedicalReport
-           #                               href="https://www.google.com" )
-           #                        #helpText( a("Click Here for the Source Code on Github!",
-           #                        #           href="https://github.com/Bohdan-Khomtchouk/Microscope",target="_blank"))
-           #                    )
-           #                  })
-           #                  #)
-           # )
-           # )
+      
            
            
            )
+    ), 
+  fluidRow(
+    tagList(
+      conditionalPanel("input.view_testImgSBID == true",
+                       
+                       # splitLayout(
+                       lapply(1:15, function(i){
+                         
+                         div(style="display:inline-block",
+                             tags$a(plotOutput(paste0("display_tested_image",i),
+                                               width= 110, height = 110), # input$zoom_MedicalReport
+                                    href="https://www.google.com" )
+                             #helpText( a("Click Here for the Source Code on Github!",
+                             #           href="https://github.com/Bohdan-Khomtchouk/Microscope",target="_blank"))
+                         )
+                       })
+                       #)
+      )
     )
+    
+  )
     )
     
     

@@ -66,7 +66,7 @@ observe({
             pred_y <- as.integer(pred[,1])
             ## Prepare this data for training we [one-hot](https://www.quora.com/What-is-one-hot-encoding-and-when-is-it-used-in-data-science) 
             ## encode the vectors into binary class matrices
-            pred_y <- keras::to_categorical(pred_y, (1+1))[,-1]  ## 8-1 length of classes 
+            pred_y <- keras::to_categorical(pred_y, (length(r_data$listFiles)+1))[,-1]  ## 8-1 length of classes 
             
             r_data[["pred_y"]] <- pred_y
           }

@@ -15,6 +15,9 @@ observeEvent(
       ## read folders
       r_data[["listFolders"]] <- list.files(readDirectoryInput(session, 'trainDirectory'),  full.names = FALSE)
       
+      ## the update selectize is not efficient to update the list of folder
+      updateSelectInput(session,  inputId = 'tested_classID', choices = r_data$listFolders,
+                        selected = r_data$listFolders[1])
     }
   }
 )
@@ -34,7 +37,7 @@ observe({
       
       r_data[["listFiles"]] <- listFiles
       
-      withProgress(message = 'Converting Images... ', value = 0.4, {
+      withProgress(message = 'Converting Images to matrix... ', value = 0.4, {
         Sys.sleep(0.25)
         
         classes <- list()
@@ -92,15 +95,15 @@ def_Model <- function(label){
       keras::layer_dropout(rate = 0.4) %>% 
       keras::layer_dense(units = 128, activation = input$activationID) %>%
       keras::layer_dropout(rate = 0.3) %>%
-      keras::layer_dense(units = length(r_data$listFiles), activation = 'softmax') ## listFiles == list of folders/classes
+      keras::layer_dense(units = length(r_data$listFiles), activation = 'softmax') ## listFiles == list of folders/classes , activation = "sigmoid"
     
     ## Next, compile the model with appropriate loss function, optimizer, and metrics:
-      MLP_model %>% 
-      keras::compile( loss = 'categorical_crossentropy',
-                      optimizer ='adam', # Stochastic Gradient Descent (SGD), ADAM and RMSprop.  optimizer_rmsprop()
+    MLP_model %>% 
+      keras::compile( loss = 'categorical_crossentropy',  # "binary_crossentropy"
+                      optimizer = input$optimizerID , # Stochastic Gradient Descent (sgd), 'adam' and 'RMSprop',  optimizer_rmsprop(lr = 2e-5)
                       metrics = c('accuracy'))
-      
-      r_data[["kerasMLP_model"]] <- MLP_model
+    
+    r_data[["kerasMLP_model"]] <- MLP_model
   }
 }
 
@@ -111,7 +114,7 @@ observe({
   isolate({
     if(length(r_data$classes) > 0){
       
-      withProgress(message = 'Compiling the model ... ', value = 0.6, {
+      withProgress(message = paste0('Compiling the', input$ModelId  ,'model ... '), value = 0.6, {
         Sys.sleep(0.25)
         
         ## sampling and merging training and testing sets
@@ -126,26 +129,26 @@ observe({
         
         
         if(input$ModelId == 'mxnet_CNN'){
-        # Setup Train arrays
-        train <- data.matrix(Train)
-        train_x <- t(train[, -1])
-        train_y <- train[, 1]
-        train_array <- train_x
-        dim(train_array) <- c(28, 28, 1, ncol(train_x))
-        
-        r_data[["train_array"]] <- train_array
-        r_data[["train_y"]] <- train_y
-        
-        ## Setup  Test arrays
-        test <- data.matrix(Test)
-        test_x <- t(test[, -1])
-        test_y <- test[, 1]
-        test_array <- test_x
-        dim(test_array) <- c(28, 28, 1, ncol(test_x))
-        
-        r_data[["test_array"]] <- test_array
-        r_data[["test_y"]] <- test_y
-        
+          # Setup Train arrays
+          train <- data.matrix(Train)
+          train_x <- t(train[, -1])
+          train_y <- train[, 1]
+          train_array <- train_x
+          dim(train_array) <- c(28, 28, 1, ncol(train_x))
+          
+          r_data[["train_array"]] <- train_array
+          r_data[["train_y"]] <- train_y
+          
+          ## Setup  Test arrays
+          test <- data.matrix(Test)
+          test_x <- t(test[, -1])
+          test_y <- test[, 1]
+          test_array <- test_x
+          dim(test_array) <- c(28, 28, 1, ncol(test_x))
+          
+          r_data[["test_array"]] <- test_array
+          r_data[["test_y"]] <- test_y
+          
         }else if(input$ModelId == 'keras_MLP'){
           train_x <- data.matrix(Train[,-1])
           r_data[["train_x"]] <- train_x
@@ -180,50 +183,52 @@ observe({
     if(input$ModelId == 'mxnet_CNN'){
       withProgress(message = 'Training model CNN ... ', value = 0.6, {
         Sys.sleep(0.25)
-      # Pre-training set up
-      #-------------------------------------------------------------------------------
-      
-      # Set seed for reproducibility
-      mxnet::mx.set.seed(100)
-      
-      # Device used. CPU in my case.
-      devices <- mxnet::mx.cpu()
-      
-      # Training
-      #-------------------------------------------------------------------------------
-      
-      # Train the model
-      model <- mxnet::mx.model.FeedForward.create(symbol = r_data$mxnetCNN_model,       # The network schema
-                                           X = r_data$train_array,         # Training array
-                                           y = r_data$train_y,             # Labels/classes of training dataset
-                                           ctx = devices,
-                                           num.round = input$numb.roundID,
-                                           array.batch.size = input$array.batch.sizeID,  # number of array in the batch size
-                                           learning.rate = 0.02,
-                                           momentum = 0.9,
-                                           optimizer = input$optimizerID,
-                                           eval.metric = mxnet::mx.metric.accuracy,
-                                           #initializer=mx.init.uniform(0.05),
-                                           epoch.end.callback = mxnet::mx.callback.log.train.metric(100))
-      
-      
-      r_data[["trained_model_mxnetCNN"]] <- model
-      #trained_model_mxnet_CNN_bkp <<- model
-      
+        # Pre-training set up
+        #-------------------------------------------------------------------------------
+        
+        # Set seed for reproducibility
+        mxnet::mx.set.seed(100)
+        
+        # Device used. CPU in my case.
+        devices <- mxnet::mx.cpu()
+        
+        # Training
+        #-------------------------------------------------------------------------------
+        
+        # Train the model
+        model <- mxnet::mx.model.FeedForward.create(symbol = r_data$mxnetCNN_model,       # The network schema
+                                                    X = r_data$train_array,         # Training array
+                                                    y = r_data$train_y,             # Labels/classes of training dataset
+                                                    ctx = devices,
+                                                    num.round = input$numb.roundID,
+                                                    array.batch.size = input$array.batch.sizeID,  # number of array in the batch size
+                                                    learning.rate = 0.02,
+                                                    momentum = 0.9,
+                                                    optimizer = input$optimizerID,
+                                                    eval.metric = mxnet::mx.metric.accuracy,
+                                                    #initializer=mx.init.uniform(0.05),
+                                                    epoch.end.callback = mxnet::mx.callback.log.train.metric(100))
+        
+        
+        r_data[["trained_model_mxnetCNN"]] <- model
+        #trained_model_mxnet_CNN_bkp <<- model
+        
       })
     }else if(input$ModelId == 'keras_MLP'){
       
       withProgress(message = 'Training model MLP ... ', value = 0.6, {
         Sys.sleep(0.25)
         
-        r_data[["trained_model_kerasMLP_metrics"]] <- r_data$kerasMLP_model %>% keras::fit(
-        r_data$train_x, r_data$train_y, 
-        epochs = input$numb.roundID, batch_size =  input$array.batch.sizeID,  ## 256 pixels ou images?  
-        validation_split = 0.2
-      )
-      
-      r_data[["trained_model_kerasMLP"]] <- r_data$kerasMLP_model
-      
+        r_data[["trained_model_kerasMLP_metrics"]] <-  r_data$kerasMLP_model %>% keras::fit(
+          r_data$train_x, r_data$train_y, 
+          epochs = input$numb.roundID, 
+          batch_size =  input$array.batch.sizeID,  ## 256 pixels ou images?  
+          validation_split = 0.2
+        )
+        
+        r_data[["trained_model_kerasMLP"]] <- r_data$kerasMLP_model
+        
+        
       })
     }
     
@@ -237,23 +242,23 @@ observe({
 observe({
   if(not_pressed(input$testSBID))  return()
   isolate({
-    
-    if(!is.null(r_data$trained_model_mxnetCNN)){  #  && input$trained_model != 0
+    if(input$ModelId == 'mxnet_CNN'){
+      #if(!is.null(r_data$trained_model_mxnetCNN)){  #  && input$trained_model != 0
       
       # predict.MXFeedForwardModel function is not exported by mxnet
       tested <- mxnet:::predict.MXFeedForwardModel(model = r_data$trained_model_mxnetCNN, 
-                                                      X = r_data$test_array)
+                                                   X = r_data$test_array)
       # Assign labels
       tested_labels <- max.col(t(tested)) -1
       r_data[["tested_labels"]] <- tested_labels
       
       # Get accuracy
-       r_data[["result_mxnet.CNN"]] <- table(r_data$test_y, tested_labels)
+      r_data[["result_mxnet.CNN"]] <- table(r_data$test_y, tested_labels)
       
       
       
-    }else if(!is.null(r_data$trained_model_kerasMLP)){
-      
+      # }else if(!is.null(r_data$trained_model_kerasMLP)){
+    }else if(input$ModelId == 'keras_MLP'){
       ## eval model
       eval <- r_data$trained_model_kerasMLP %>% keras::evaluate(r_data$test_x, r_data$test_y)
       #eval <- data.frame(eval)
@@ -273,5 +278,5 @@ observe({
       r_data[["result_keras.MLP"]] <- list(evaluation = unlist(eval), prediction= result)
     }
   })
-    
-  })
+  
+})
